@@ -4,9 +4,9 @@ import requests, time
 NUM_OF_SCRAPPED_PAGES = 5
 BASE_URL = "https://www.nehnutelnosti.sk/vysledky/byty/kosice/prenajom"
 
-prices_data = []
-location_data = []
-rooms_data = []
+raw_prices_data = []
+raw_location_data = []
+raw_rooms_data = []
 
 for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
     print(f"=== PAGE {page} ===")
@@ -29,9 +29,9 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
         if 'mui-16di0u5' in p.get("class") and 'mui-1blo5z7' in p.parent.get("class"):
             page_rooms_data.append(p.text)
 
-    prices_data.extend(page_prices_data)
-    location_data.extend(page_location_data)
-    rooms_data.extend(page_rooms_data)
+    raw_prices_data.extend(page_prices_data)
+    raw_location_data.extend(page_location_data)
+    raw_rooms_data.extend(page_rooms_data)
 
     print(f"Price data pieces scrapped: {len(page_prices_data)}")
     print(f"Location data pieces scrapped: {len(page_location_data)}")
@@ -39,9 +39,45 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
 
     time.sleep(1)
 
-if not (len(prices_data) == len(location_data) == len(rooms_data)):
-    raise ValueError(f"Mismatch: {len(prices_data)} prices vs {len(location_data)} location data pieces")
+if not (len(raw_prices_data) == len(raw_location_data) == len(raw_rooms_data)):
+    raise ValueError(f"Mismatch: some data is missing.")
 
-#print(prices_data)
-#print(location_data)
-print(rooms_data)
+# print(raw_prices_data)
+# print(raw_location_data)
+# print(raw_rooms_data)
+
+# CLEAN DATA!
+
+## CLEAN PRICES
+clean_prices_data = []
+for price in raw_prices_data:
+    try:
+        clean_price = int(price.replace("\xa0", "").strip(" €/mes."))
+        clean_prices_data.append(clean_price)
+    except ValueError:
+        print(f"Could not parse: {price}")
+# print(clean_prices_data)
+
+## CLEAN LOCATION
+clean_district_data = []
+clean_county_data = []
+
+for location in raw_location_data:
+    clean_location = location.split(', ')
+    if(len(clean_location) == 2):
+        clean_district_data.append(clean_location[0].replace("Košice-", ""))
+        clean_county_data.append(clean_location[1])
+    else:
+        clean_district_data.append(clean_location[1])
+        clean_county_data.append(clean_location[2])
+# print(clean_district_data)
+# print(clean_county_data)
+
+## CLEAN ROOMS
+clean_rooms_data = []
+for rooms in raw_rooms_data:
+    if rooms == "Garsónka" or rooms == "Mezonet":
+        clean_rooms_data.append(rooms)
+    else:
+        clean_rooms_data.append(int(rooms[0]))
+#print(clean_rooms_data)
