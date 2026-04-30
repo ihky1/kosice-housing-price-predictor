@@ -1,2 +1,8 @@
 #
 TODO.md
+
+data/processed
+data/raw
+
+!data/processed/.gitkeep
+!data/raw/.gitkeep
