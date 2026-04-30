@@ -1,9 +1,14 @@
 from bs4 import BeautifulSoup
-import requests, time
+from pathlib import Path
+import requests, time, pandas as pd
 
 NUM_OF_SCRAPPED_PAGES = 5
 BASE_URL = "https://www.nehnutelnosti.sk/vysledky/byty/kosice/prenajom"
 
+ROOT = Path(__file__).parent.parent
+OUTPUT_PATH = ROOT / "data" / "processed" / "kosice_housing_prices_data.csv"
+
+# == SCRAPE DATA ==
 raw_prices_data = []
 raw_location_data = []
 raw_rooms_data = []
@@ -46,7 +51,7 @@ if not (len(raw_prices_data) == len(raw_location_data) == len(raw_rooms_data)):
 # print(raw_location_data)
 # print(raw_rooms_data)
 
-# CLEAN DATA!
+# == CLEAN DATA ==
 
 ## CLEAN PRICES
 clean_prices_data = []
@@ -81,3 +86,14 @@ for rooms in raw_rooms_data:
     else:
         clean_rooms_data.append(int(rooms[0]))
 #print(clean_rooms_data)
+
+## == EXPORT DATA ==
+data = {
+    "price": clean_prices_data,
+    "district": clean_district_data,
+    "county": clean_county_data,
+    "rooms": clean_rooms_data
+}
+
+df = pd.DataFrame(data=data)
+df.to_csv(OUTPUT_PATH, index=False)
