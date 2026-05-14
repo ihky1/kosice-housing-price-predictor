@@ -106,6 +106,7 @@ clean_area_data = [
     float(area.replace(" m²", "")) if area is not None else None
     for area in raw_area_data
 ]
+# print(clean_area_data)
 
 ## == EXPORT DATA ==
 data = {
