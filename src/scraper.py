@@ -85,10 +85,10 @@ for location in raw_location_data:
     clean_location = location.split(', ')
     if(len(clean_location) == 2):
         clean_district_data.append(clean_location[0].replace("Košice-", ""))
-        clean_county_data.append(clean_location[1])
+        clean_county_data.append(clean_location[1].replace("okres ", ""))
     else:
         clean_district_data.append(clean_location[1].replace("Košice-", ""))
-        clean_county_data.append(clean_location[2])
+        clean_county_data.append(clean_location[2].replace("okres ", ""))
 # print(clean_district_data)
 # print(clean_county_data)
 
