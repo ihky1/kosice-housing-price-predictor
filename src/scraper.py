@@ -102,12 +102,10 @@ for rooms in raw_rooms_data:
 #print(clean_rooms_data)
 
 ## CLEAN AREA
-clean_area_data = []
-for area in raw_area_data:
-    if area != None:
-        clean_area_data.append(float(area.replace(" m²", "")))
-    else:
-        clean_area_data.append(None)
+clean_area_data = [
+    float(area.replace(" m²", "")) if area is not None else None
+    for area in raw_area_data
+]
 
 ## == EXPORT DATA ==
 data = {
