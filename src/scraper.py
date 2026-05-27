@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 import requests, time, pandas as pd
 
-NUM_OF_SCRAPPED_PAGES = 5
+NUM_OF_SCRAPPED_PAGES = 10
 BASE_URL = "https://www.nehnutelnosti.sk/vysledky/byty/kosice/prenajom"
 
 ROOT = Path(__file__).parent.parent
@@ -29,8 +29,11 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
     page_area_data = []
 
     for p in all_text:
-        if (len(p.text) > 6 and "€/mes." in p.text[-6:] or len(p.text) > 1 and "€" in p.text[-1]) and 'mui-pc6no8' in p.parent.parent.get("class"):
-            page_prices_data.append(p.text)
+        if (len(p.text) > 6 and "€/mes." in p.text[-6:] or (len(p.text) > 1 and "€" in p.text[-1]) or "Info v RK" in p.text) and 'mui-pc6no8' in p.parent.parent.get("class"):
+            if("Info v RK" in p.text):
+                page_prices_data.append(None)
+            else:
+                page_prices_data.append(p.text)
         if 'mui-5t198y' in p.get("class") and 'mui-1blo5z7' in p.parent.get("class"):
             page_location_data.append(p.text)
         if 'mui-16di0u5' in p.get("class") and 'mui-1blo5z7' in p.parent.get("class"):
@@ -44,6 +47,9 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
             page_area_data.append(area_el.find("p").text)
         else:
             page_area_data.append(None)
+
+    if(page == 6):
+        print(page_prices_data)
 
     raw_prices_data.extend(page_prices_data)
     raw_location_data.extend(page_location_data)
@@ -70,6 +76,9 @@ if not (len(raw_prices_data) == len(raw_location_data) == len(raw_rooms_data) ==
 ## CLEAN PRICES
 clean_prices_data = []
 for price in raw_prices_data:
+    if price == None:
+        clean_prices_data.append(None)
+        continue
     try:
         clean_price = int(price.replace("\xa0", "").strip(" €/mes."))
         clean_prices_data.append(clean_price)
