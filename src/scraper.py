@@ -29,7 +29,7 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
     page_area_data = []
 
     for p in all_text:
-        if len(p.text) > 6 and "€/mes." in p.text[-6:] and 'mui-pc6no8' in p.parent.parent.get("class"):
+        if (len(p.text) > 6 and "€/mes." in p.text[-6:] or len(p.text) > 1 and "€" in p.text[-1]) and 'mui-pc6no8' in p.parent.parent.get("class"):
             page_prices_data.append(p.text)
         if 'mui-5t198y' in p.get("class") and 'mui-1blo5z7' in p.parent.get("class"):
             page_location_data.append(p.text)
