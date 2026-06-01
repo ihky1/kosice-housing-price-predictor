@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 import requests, time, pandas as pd
 
-NUM_OF_SCRAPPED_PAGES = 10
+NUM_OF_SCRAPPED_PAGES = 15
 BASE_URL = "https://www.nehnutelnosti.sk/vysledky/byty/kosice/prenajom"
 
 ROOT = Path(__file__).parent.parent
@@ -29,8 +29,8 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
     page_area_data = []
 
     for p in all_text:
-        if (len(p.text) > 6 and "€/mes." in p.text[-6:] or (len(p.text) > 1 and "€" in p.text[-1]) or "Info v RK" in p.text) and 'mui-pc6no8' in p.parent.parent.get("class"):
-            if("Info v RK" in p.text):
+        if (len(p.text) > 6 and "€/mes." in p.text[-6:] or (len(p.text) > 1 and "€" in p.text[-1]) or "Info v RK" in p.text or "Cena dohodou" in p.text) and 'mui-pc6no8' in p.parent.parent.get("class"):
+            if("Info v RK" in p.text or "Cena dohodou" in p.text):
                 page_prices_data.append(None)
             else:
                 page_prices_data.append(p.text)
@@ -48,8 +48,9 @@ for page in range(1, NUM_OF_SCRAPPED_PAGES + 1):
         else:
             page_area_data.append(None)
 
-    if(page == 6):
-        print(page_prices_data)
+    if(len(page_prices_data) == 0 and len(page_location_data) == 0 and len(page_rooms_data) == 0 and len(page_area_data) == 0):
+        print("PAGE IS EMPTY !")
+        break
 
     raw_prices_data.extend(page_prices_data)
     raw_location_data.extend(page_location_data)
